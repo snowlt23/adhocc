@@ -8,6 +8,7 @@ string* new_string_cap(int cap) {
   memset(s->data, 0, (cap+1)*sizeof(char));
   s->len = 0;
   s->cap = cap;
+  return s;
 }
 
 string* empty_string() {
@@ -25,6 +26,13 @@ void string_push(string* s, char* p) {
   string_extend(s, strlen(p));
   strcpy(s->data + s->len, p);
   s->len += strlen(p);
+}
+
+void string_pushc(string* s, char c) {
+  string_extend(s, 1);
+  *(s->data + s->len) = c;
+  *(s->data + s->len+1) = '\0';
+  s->len += 1;
 }
 
 string* new_string(char* p) {
