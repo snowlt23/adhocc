@@ -1,7 +1,11 @@
 #ifndef _ADHOCC_H_
 #define _ADHOCC_H_
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+
+#define error(...) {fprintf(stderr, __VA_ARGS__); exit(0);}
 
 typedef struct {
   char* data;

@@ -24,4 +24,4 @@ gcc -Wall -oadhocc.out adhocc.c string.c
 unittest "string_test.c"
 
 adhocctest "yukari" "yukari"
-adhocctest "%%enum TokenKind" "enum TokenKind {};"
+adhocctest "%%deadcode" "0xDEADC0DE"
