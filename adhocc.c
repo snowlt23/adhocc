@@ -6,10 +6,17 @@
 #define ADHOCC_BEGIN void* adhocc_table[] = {
 #define ADHOCC_HOOK(name, p) (void*)name, (void*)p,
 #define ADHOCC_END };
+#define ADHOCC_DEF(name, body) void name() { adhocc_prologue(); body; adhocc_epilogue(); }
+
+int gLine = 1;
 
 void skip_spaces() {
   for (;;) {
     char c = getc(stdin);
+    if (c == '\n') {
+      gLine++;
+      continue;
+    }
     if (c == '\r' || c == '\n' || c == ' ' || c == '\t') continue;
     ungetc(c, stdin);
     break;
@@ -29,7 +36,12 @@ string* parse_ident() {
   return s;
 }
 
-void trans_enum() {
+void adhocc_prologue() {}
+void adhocc_epilogue() {
+  printf("\n#line %d\n", gLine-1);
+}
+
+ADHOCC_DEF(trans_enum, {
   skip_spaces();
   string* enumname = parse_ident();
   skip_spaces();
@@ -47,28 +59,24 @@ void trans_enum() {
 
     string* kind = parse_ident();
 
-    string_push(enumsrc, string_cstr(kind));
-    string_push(enumsrc, ", ");
-
-    string_push(tostrsrc, "if (kind == ");
-    string_push(tostrsrc, string_cstr(kind));
-    string_push(tostrsrc, ") return \"");
-    string_push(tostrsrc, string_cstr(kind));
-    string_push(tostrsrc, "\"; ");
+    string* s = empty_string();
+    format(s, "%s, ", cstr(kind));
+    pushs(enumsrc, cstr(s));
+    format(s, "if (kind == %s) return \"%s\";", cstr(kind), cstr(kind));
+    pushs(tostrsrc, cstr(s));
 
     skip_spaces();
     c = getc(stdin);
     if (c == ',') continue;
     ungetc(c, stdin);
   }
+  if (getc(stdin) != ';') error("expected ; token in %%%%enum");
 
   printf("typedef enum { %s } %s;\n", string_cstr(enumsrc), string_cstr(enumname));
   printf("char* %s_tostring(%s kind) { %s }\n", string_cstr(enumname), string_cstr(enumname), string_cstr(tostrsrc));
-}
+});
 
-void trans_deadcode() {
-  printf("0xDEADC0DE");
-}
+ADHOCC_DEF(trans_deadcode, printf("0xDEADC0DE"));
 
 ADHOCC_BEGIN
 ADHOCC_HOOK("enum", trans_enum)
@@ -112,6 +120,7 @@ void adhocc_trans() {
         ungetc(c, stdin);
       }
     } else {
+      if (c == '\n') gLine++;
       printf("%c", c);
     }
   }

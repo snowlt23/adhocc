@@ -3,10 +3,10 @@
 
 int main() {
   string* s = empty_string();
-  string_push(s, "Hello ");
-  string_push(s, "Yukari ");
-  string_push(s, "and ");
-  string_push(s, "Maki!");
+  string_pushs(s, "Hello ");
+  string_pushs(s, "Yukari ");
+  string_pushs(s, "and ");
+  string_pushs(s, "Maki!");
   assert(strcmp("Hello Yukari and Maki!", string_cstr(s)) == 0);
 
   string* s2 = new_string("AKARI");

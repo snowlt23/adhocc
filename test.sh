@@ -12,6 +12,7 @@ unittest() {
 
 adhocctest() {
   OUT=`echo "$1" | ./adhocc.out`
+  OUT=`echo $OUT`
   if [ "$OUT" = "$2" ] ; then
     echo "[OK] adhocc: $1"
   else
@@ -24,4 +25,4 @@ gcc -Wall -oadhocc.out adhocc.c string.c
 unittest "string_test.c"
 
 adhocctest "yukari" "yukari"
-adhocctest "%%deadcode" "0xDEADC0DE"
+adhocctest "%%deadcode" "0xDEADC0DE #line 0"

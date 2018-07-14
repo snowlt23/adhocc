@@ -2,5 +2,6 @@
 *.exe
 *.out
 *.o
+out.c
 *.log
 .vagrant/

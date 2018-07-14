@@ -22,7 +22,7 @@ void string_extend(string* s, int len) {
   }
 }
 
-void string_push(string* s, char* p) {
+void string_pushs(string* s, char* p) {
   string_extend(s, strlen(p));
   strcpy(s->data + s->len, p);
   s->len += strlen(p);
@@ -37,7 +37,7 @@ void string_pushc(string* s, char c) {
 
 string* new_string(char* p) {
   string* s = empty_string();
-  string_push(s, p);
+  string_pushs(s, p);
   return s;
 }
 
