@@ -1,7 +1,8 @@
-
+adhocc
 *.exe
 *.out
 *.o
 out.c
+*.swp
 *.log
 .vagrant/

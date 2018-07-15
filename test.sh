@@ -1,4 +1,3 @@
-
 unittest() {
   gcc -otest.out $1
   ./test.out
@@ -11,7 +10,7 @@ unittest() {
 }
 
 adhocctest() {
-  OUT=`echo "$1" | ./adhocc.out`
+  OUT=`echo "$1" | ./adhocc`
   OUT=`echo $OUT`
   if [ "$OUT" = "$2" ] ; then
     echo "[OK] adhocc: $1"
@@ -19,8 +18,6 @@ adhocctest() {
     echo "[ERROR] adhocc: $1, expected $2, but got $OUT"
   fi
 }
-
-gcc -Wall -oadhocc.out adhocc.c string.c
 
 unittest "string_test.c"
 
