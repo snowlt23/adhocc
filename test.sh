@@ -10,7 +10,7 @@ unittest() {
 }
 
 adhocctest() {
-  OUT=`echo "$1" | ./adhocc`
+  OUT=`echo "$1" | ./adhocc.out`
   OUT=`echo $OUT`
   if [ "$OUT" = "$2" ] ; then
     echo "[OK] adhocc: $1"

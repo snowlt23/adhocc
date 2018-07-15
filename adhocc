@@ -1,0 +1,16 @@
+#!/bin/sh
+
+APPDIR=`dirname $0`
+
+if [ "$1" = "build" ] ; then
+  [ -e adhocctmp ] || mkdir adhocctmp
+  cp $APPDIR/string.c adhocctmp/
+  cp $APPDIR/adhocc.c adhocctmp/
+  cp $APPDIR/adhocc.h adhocctmp/
+  cp $APPDIR/Makefile adhocctmp/
+  cat $2 | $APPDIR/adhocc.out > adhocctmp/adhocc_default.c
+  cd adhocctmp
+  make build
+else
+  ./adhocctmp/adhocc.out < /dev/stdin
+fi

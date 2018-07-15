@@ -1,41 +1,35 @@
-ADHOCC_DEF(trans_enum, {
+void* hooknames[1024] = {};
+int hooknamepos = 0;
+
+ADHOCC_DEF(trans_hook, {
   skip_spaces();
-  string* enumname = parse_ident();
+  string* hookname = parse_ident();
+  hooknames[hooknamepos] = hookname;
+  hooknamepos++;
+
   skip_spaces();
-  if (getc(stdin) != '{') error("expected { token in %%%%enum");
-  skip_spaces();
-
-  string* enumsrc = empty_string();
-  string* tostrsrc = empty_string();
-
-  for (;;) {
-    skip_spaces();
-    char c = getc(stdin);
-    if (c == '}') break;
-    ungetc(c, stdin);
-
-    string* kind = parse_ident();
-
-    string* s = empty_string();
-    format(s, "%s, ", cstr(kind));
-    pushs(enumsrc, cstr(s));
-    format(s, "if (kind == %s) return \"%s\";", cstr(kind), cstr(kind));
-    pushs(tostrsrc, cstr(s));
-
-    skip_spaces();
-    c = getc(stdin);
-    if (c == ',') continue;
-    ungetc(c, stdin);
-  }
-  if (getc(stdin) != ';') error("expected ; token in %%%%enum");
-
-  printf("typedef enum { %s } %s;\n", string_cstr(enumsrc), string_cstr(enumname));
-  printf("char* %s_tostring(%s kind) { %s }\n", string_cstr(enumname), string_cstr(enumname), string_cstr(tostrsrc));
+  string* body = parse_block();
+  printf("void adhocc_hook_%s() {adhocc_prologue(); %s; adhocc_epilogue();}", cstr(hookname), cstr(body));
 });
+
+void post_hook() {
+  printf("ADHOCC_BEGIN\n");
+  for (int i=0; i<hooknamepos; i++) {
+    char* hookname = cstr((string*)hooknames[i]);
+    printf("ADHOCC_HOOK(\"%s\", adhocc_hook_%s)\n", hookname, hookname);
+  }
+  printf("ADHOCC_END\n");
+  printf("ADHOCC_POST_BEGIN\n");
+  printf("ADHOCC_POST_END\n");
+}
 
 ADHOCC_DEF(trans_deadcode, printf("0xDEADC0DE"));
 
 ADHOCC_BEGIN
-ADHOCC_HOOK("enum", trans_enum)
+ADHOCC_HOOK("hook", trans_hook)
 ADHOCC_HOOK("deadcode", trans_deadcode)
 ADHOCC_END
+
+ADHOCC_POST_BEGIN
+ADHOCC_POST(post_hook)
+ADHOCC_POST_END

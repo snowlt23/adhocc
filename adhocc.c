@@ -8,6 +8,10 @@
 #define ADHOCC_END };
 #define ADHOCC_DEF(name, body) void name() { adhocc_prologue(); body; adhocc_epilogue(); }
 
+#define ADHOCC_POST_BEGIN void* adhocc_post_table[] = {
+#define ADHOCC_POST(p) (void*)p,
+#define ADHOCC_POST_END };
+
 int gLine = 1;
 
 void skip_spaces() {
@@ -34,6 +38,44 @@ string* parse_ident() {
     string_pushc(s, c);
   }
   return s;
+}
+
+string* parse_string() {
+  char c = getc(stdin);
+  if (c != '"') error("expect \" token in parse_string");
+  string* s = empty_string();
+  for (;;) {
+    c = getc(stdin);
+    if (c == '"') break;
+    pushc(s, c);
+  }
+  return s;
+}
+string* parse_block() {
+  int blockcount = 0;
+  string* blksrc = empty_string();
+  for (;;) {
+    char c = getc(stdin);
+    if (c == EOF) {
+      error("unexpected EOF reached");
+    } else if (c == '"') {
+      ungetc(c, stdin);
+      string* s = parse_string();
+      pushc(blksrc, '"');
+      pushs(blksrc, cstr(s));
+      pushc(blksrc, '"');
+    } else if (c == '{') {
+      pushc(blksrc, c);
+      blockcount++;
+    } else if (c == '}') {
+      pushc(blksrc, c);
+      blockcount--;
+      if (blockcount == 0) break;
+    } else {
+      pushc(blksrc, c);
+    }
+  }
+  return blksrc;
 }
 
 void adhocc_prologue() {}
@@ -83,6 +125,11 @@ void adhocc_trans() {
       if (c == '\n') gLine++;
       printf("%c", c);
     }
+  }
+
+  // post process
+  for (int i=0; i<sizeof(adhocc_post_table)/sizeof(void*); i++) {
+    ((void (*)())adhocc_post_table[i])();
   }
 }
 
