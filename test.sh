@@ -6,20 +6,27 @@ unittest() {
     echo "[OK] unittest: $1"
   else
     echo "[ERROR] unittest: $1"
+    exit 1
   fi
 }
 
 adhocctest() {
-  OUT=`echo "$1" | ./adhocc.out`
-  OUT=`echo $OUT`
-  if [ "$OUT" = "$2" ] ; then
+  cat $1 | ./adhocc > out.c
+  gcc -o test.out out.c
+  ./test.out
+  RETCODE=$?
+  if [ $RETCODE = 0 ] ; then
     echo "[OK] adhocc: $1"
   else
-    echo "[ERROR] adhocc: $1, expected $2, but got $OUT"
+    echo "[ERROR] adhocc: $1"
+    exit 1
   fi
 }
 
 unittest "string_test.c"
 
-adhocctest "yukari" "yukari"
-adhocctest "%%deadcode" "0xDEADC0DE #line 0"
+./adhocc build adhocc_example.c
+
+adhocctest "test/blank.c"
+adhocctest "test/deadcode.c"
+adhocctest "test/enum_stringer.c"

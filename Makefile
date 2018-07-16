@@ -11,8 +11,9 @@ build: adhocc.out
 adhocc.out: $(ADHOCC_SRCS) adhocc_default.c adhocc.h
 	$(CC) $(CFLAGS) -o adhocc.out $(ADHOCC_SRCS)
 
+.PHONY: test
 test: adhocc.out
 	./test.sh
 
 clean:
-	rm adhocc.out $(ADHOCC_SRCS)
+	rm -rf adhocc.out $(ADHOCC_SRCS) out.c adhocctmp/
