@@ -3,6 +3,7 @@ adhocctmp/
 *.out
 *.o
 out.c
+adout.c
 *.swp
 *.log
 .vagrant/

@@ -11,8 +11,8 @@ unittest() {
 }
 
 adhocctest() {
-  cat $1 | ./adhocc > out.c
-  gcc -o test.out out.c
+  cat $1 | ./adhocc adout.c > out.c
+  gcc -o test.out out.c adout.c
   ./test.out
   RETCODE=$?
   if [ $RETCODE = 0 ] ; then

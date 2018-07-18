@@ -12,5 +12,5 @@ if [ "$1" = "build" ] ; then
   cd adhocctmp
   make build
 else
-  ./adhocctmp/adhocc.out < /dev/stdin
+  ./adhocctmp/adhocc.out $@ < /dev/stdin
 fi

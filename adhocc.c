@@ -12,7 +12,10 @@
 #define ADHOCC_POST(p) (void*)p,
 #define ADHOCC_POST_END };
 
+#define adprintf(...) {if (adfile == NULL) error("adfile is null."); fprintf(adfile, __VA_ARGS__);}
+
 int gLine = 1;
+FILE* adfile = NULL;
 
 void skip_spaces() {
   for (;;) {
@@ -133,6 +136,13 @@ void adhocc_trans() {
   }
 }
 
-int main() {
+int main(int argc, char** argv) {
+  if (argc == 2) {
+    adfile = fopen(argv[1], "w");
+    if (adfile == NULL) {
+      fprintf(stderr, "couldn't open %s file", argv[0]);
+      return 1;
+    }
+  }
   adhocc_trans();
 }
