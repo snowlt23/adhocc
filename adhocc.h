@@ -21,6 +21,13 @@ typedef struct {
   int cap;
 } string;
 
+typedef struct {
+  void** data;
+  int len;
+  int cap;
+} vector;
+
+// string.c
 string* new_string_cap(int cap);
 string* empty_string();
 void string_extend(string* s, int len);
@@ -28,6 +35,13 @@ void string_pushs(string* s, char* p);
 void string_pushc(string* s, char c);
 string* new_string(char* p);
 char* string_cstr(string* s);
+
+// vector.c
+vector* new_vector_cap(int cap);
+vector* new_vector();
+void* vector_get(vector* v, int index);
+void vector_set(vector* v, int index, void* elem);
+void vector_push(vector* v, void* elem);
 
 void adhocc_trans();
 

@@ -5,6 +5,7 @@ APPDIR=`dirname $0`
 if [ "$1" = "build" ] ; then
   [ -e adhocctmp ] || mkdir adhocctmp
   cp $APPDIR/string.c adhocctmp/
+  cp $APPDIR/vector.c adhocctmp/
   cp $APPDIR/adhocc.c adhocctmp/
   cp $APPDIR/adhocc.h adhocctmp/
   cp $APPDIR/Makefile adhocctmp/

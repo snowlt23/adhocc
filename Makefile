@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall
 
-ADHOCC_SRCS = adhocc.o string.o
+ADHOCC_SRCS = adhocc.o string.o vector.o
 
 build: adhocc.out
 
