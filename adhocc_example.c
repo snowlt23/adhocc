@@ -36,3 +36,48 @@
 %%hook deadcode {
   printf("0xDEADC0DE");
 }
+
+typedef struct {
+  string* name;
+  string* body;
+} Template;
+
+Template tnames[1024] = {};
+int tnamepos = 0;
+
+%%hook template {
+  skip_spaces();
+  string* name = parse_ident();
+  skip_spaces();
+  string* body = parse_block();
+  tnames[tnamepos] = (Template){name, body};
+  tnamepos++;
+}
+
+%%hook expand {
+  skip_spaces();
+  string* name = parse_ident();
+  vector* args = parse_arguments();
+  string* tmpl = NULL;
+  for (int i=0; i<tnamepos; i++) {
+    if (strcmp(tnames[i].name->data, name->data) == 0) {
+      tmpl = tnames[i].body;
+      break;
+    }
+  }
+  if (tmpl == NULL) error("undefined %s template.", name->data);
+
+  for (int i=1; i<tmpl->len-1; i++) {
+    char c = tmpl->data[i];
+    if (c == '%') {
+      if (i+2 < tmpl->len && tmpl->data[i+1] == '%') {
+        int n = tmpl->data[i+2] - '1';
+        if (args->len <= n) error("%s expand hasn't %d argument.", name->data, n);
+        printf("%s", ((string*)vector_get(args, n))->data);
+        i+=2;
+        continue;
+      }
+    }
+    printf("%c", c);
+  }
+}

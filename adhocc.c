@@ -80,6 +80,24 @@ string* parse_block() {
   }
   return blksrc;
 }
+vector* parse_arguments() {
+  vector* args = new_vector();
+  char c;
+  c = getc(stdin);
+  if (c != '(') return NULL;
+  skip_spaces();
+  for (;;) {
+    string* id = parse_ident();
+    vector_push(args, id);
+    skip_spaces();
+    c = getc(stdin);
+    skip_spaces();
+    if (c == ')') break;
+    skip_spaces();
+    if (c != ',') ungetc(c, stdin);
+  }
+  return args;
+}
 
 void adhocc_prologue() {}
 void adhocc_epilogue() {
