@@ -80,6 +80,25 @@ string* parse_block() {
   }
   return blksrc;
 }
+
+string* parse_until(char* uc) {
+  string* s = empty_string();
+  for (;;) {
+    char c = getc(stdin);
+    if (c == EOF) {
+      return s;
+    }
+    for (int i=0; i<strlen(uc); i++) {
+      if (uc[i] == c) {
+        ungetc(c, stdin);
+        return s;
+      }
+    }
+    pushc(s, c);
+  }
+  return NULL;
+}
+
 vector* parse_arguments() {
   vector* args = new_vector();
   char c;
@@ -87,7 +106,7 @@ vector* parse_arguments() {
   if (c != '(') return NULL;
   skip_spaces();
   for (;;) {
-    string* id = parse_ident();
+    string* id = parse_until(",)");
     vector_push(args, id);
     skip_spaces();
     c = getc(stdin);
