@@ -39,18 +39,29 @@
 
 typedef struct {
   string* name;
-  string* body;
+  string* cbody;
+  string* hbody;
 } Template;
 
 Template tnames[1024] = {};
 int tnamepos = 0;
 
+%%hook adinclude {
+  skip_spaces();
+  string* s = parse_string();
+  adprintf("#include \"%s\"\n", s->data);
+}
+
 %%hook template {
   skip_spaces();
   string* name = parse_ident();
   skip_spaces();
-  string* body = parse_block();
-  tnames[tnamepos] = (Template){name, body};
+  string* hbody = parse_block();
+  if (hbody == NULL) error("template expect header block.");
+  skip_spaces();
+  string* cbody = parse_block();
+  if (cbody == NULL) error("template expect c block.");
+  tnames[tnamepos] = (Template){name, cbody, hbody};
   tnamepos++;
 }
 
@@ -58,20 +69,22 @@ int tnamepos = 0;
   skip_spaces();
   string* name = parse_ident();
   vector* args = parse_arguments();
-  string* tmpl = NULL;
+  string* ctmpl = NULL;
+  string* htmpl = NULL;
   for (int i=0; i<tnamepos; i++) {
     if (strcmp(tnames[i].name->data, name->data) == 0) {
-      tmpl = tnames[i].body;
+      ctmpl = tnames[i].cbody;
+      htmpl = tnames[i].hbody;
       break;
     }
   }
-  if (tmpl == NULL) error("undefined %s template.", name->data);
+  if (ctmpl == NULL || htmpl == NULL) error("undefined %s template.", name->data);
 
-  for (int i=1; i<tmpl->len-1; i++) {
-    char c = tmpl->data[i];
+  for (int i=1; i<htmpl->len-1; i++) {
+    char c = htmpl->data[i];
     if (c == '%') {
-      if (i+2 < tmpl->len && tmpl->data[i+1] == '%') {
-        int n = tmpl->data[i+2] - '1';
+      if (i+2 < htmpl->len && htmpl->data[i+1] == '%') {
+        int n = htmpl->data[i+2] - '1';
         if (args->len <= n) error("%s expand hasn't %d argument.", name->data, n);
         printf("%s", ((string*)vector_get(args, n))->data);
         i+=2;
@@ -79,5 +92,18 @@ int tnamepos = 0;
       }
     }
     printf("%c", c);
+  }
+  for (int i=1; i<ctmpl->len-1; i++) {
+    char c = ctmpl->data[i];
+    if (c == '%') {
+      if (i+2 < ctmpl->len && ctmpl->data[i+1] == '%') {
+        int n = ctmpl->data[i+2] - '1';
+        if (args->len <= n) error("%s expand hasn't %d argument.", name->data, n);
+        adprintf("%s", ((string*)vector_get(args, n))->data);
+        i+=2;
+        continue;
+      }
+    }
+    adprintf("%c", c);
   }
 }

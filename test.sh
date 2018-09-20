@@ -12,7 +12,7 @@ unittest() {
 
 adhocctest() {
   cat $1 | ./adhocc adout.c > out.c
-  gcc -o test.out out.c adout.c
+  gcc -o test.out out.c adout.c $2
   ./test.out
   RETCODE=$?
   if [ $RETCODE = 0 ] ; then
@@ -30,4 +30,4 @@ unittest "string_test.c"
 adhocctest "test/blank.c"
 adhocctest "test/deadcode.c"
 adhocctest "test/enum_stringer.c"
-adhocctest "test/template.c"
+adhocctest "test/template.h" "test/template.c"

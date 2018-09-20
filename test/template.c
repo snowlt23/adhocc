@@ -1,14 +1,8 @@
 
-%%template TIList {
-  typedef struct {
-    int index;
-  } IList%%1;
-}
-
-%%expand TIList(int)
+#include "../out.c"
 
 int main() {
-  IListint li;
+  IListint il;
   return 0;
 }
 
